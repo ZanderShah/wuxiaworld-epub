@@ -5,6 +5,7 @@ import uuid
 import base64
 import argparse
 import re
+import time
 
 BASE_LINK = 'http://www.wuxiaworld.com/'
 
@@ -20,7 +21,7 @@ def wxw():
 
     series_title = re.search(r'([^:–()])*\w', index_soup.find('h1', attrs={'class': 'entry-title'}).get_text()).group()
 
-    raw_chapter_links = [a['href'] for a in index_soup.select('div[itemprop=articleBody] a[href]')]
+    raw_chapter_links = a['href'] for a in index_soup.select('div[itemprop=articleBody] a[href]')
     books = {}
     chapters = {}
 
@@ -62,7 +63,7 @@ def wxw():
         chapter_title = re.search(r'\w([^–:])*$', parsed_chapter[0]).group()
         chapter = epub.EpubHtml(
             title=chapter_title,
-            file_name='{}.xhtml'.format(base64.urlsafe_b64encode(chapter_title.encode())),
+            file_name='{}.xhtml'.format(uuid.uuid4().hex),
             lang='en'
         )
         # Chapter Title
@@ -72,6 +73,7 @@ def wxw():
         books[book_number].add_item(chapter)
         books[book_number].toc += (epub.Link(chapter.file_name, chapter.title, uuid.uuid4().hex), )
         chapters[book_number].append(chapter)
+        time.sleep(1)
         print('Finished parsing', raw_chapter_link)
 
     for book_number, book in books.items():
