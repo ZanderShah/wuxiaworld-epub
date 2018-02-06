@@ -62,7 +62,7 @@ def wxw():
         chapter_title = re.search(r'\w([^–:])*$', parsed_chapter[0]).group()
         chapter = epub.EpubHtml(
             title=chapter_title,
-            file_name='{}.xhtml'.format(''.join(c for c in chapter_title if c.isalnum())),
+            file_name='{}.xhtml'.format(base64.urlsafe_b64encode(chapter_title.encode())),
             lang='en'
         )
         # Chapter Title
@@ -72,6 +72,7 @@ def wxw():
         books[book_number].add_item(chapter)
         books[book_number].toc += (epub.Link(chapter.file_name, chapter.title, uuid.uuid4().hex), )
         chapters[book_number].append(chapter)
+        print('Finished parsing', raw_chapter_link)
 
     for book_number, book in books.items():
         book.add_item(epub.EpubNcx())
